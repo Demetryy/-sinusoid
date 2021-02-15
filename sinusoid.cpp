@@ -1,4 +1,4 @@
-﻿#include "windows.h"
+#include "windows.h"
 #include "mmsystem.h"
 #include <math.h> 
 #include <fstream>
@@ -65,15 +65,17 @@ int main()
 
     WAVEFORMAT pcmObj;
     short frameSize = (short)(16 / 8);
+    int time;
 
     cout << "Введите частоту дискретизации: "; cin >> pcmObj.nSamplesPerSec;
     cout << "Введите число каналов: "; cin >> pcmObj.nChannels;
+    cout << "Введите время: "; cin >> time;
 
     pcmObj.nAvgBytesPerSec = pcmObj.nSamplesPerSec * 16 / 8;
 
     InputOfSignatures(chunk, file); //"RIFF"
 
-    longWrite(220000, file); //вес - 36 * количество байт в области данных
+    longWrite(pcmObj.nSamplesPerSec * frameSize, file); //вес - 36 * количество байт в области данных
 
 
     InputOfSignatures(format, file); //"WAVE"
@@ -89,15 +91,14 @@ int main()
 
     InputOfSignatures(data, file);
 
-    int Time = 20;
-    long DataLeng = pcmObj.nSamplesPerSec * Time;
+    long DataLeng = pcmObj.nSamplesPerSec * time;
     longWrite(DataLeng, file);
 
 
     short* _data = new short[pcmObj.nSamplesPerSec];
     double frequency = PI * 2 * 440.0 / pcmObj.nSamplesPerSec;
 
-    for (int sec = 0; sec < Time; sec++) {
+    for (int sec = 0; sec < time*2; sec++) {
 
         for (int index = 0; index < pcmObj.nSamplesPerSec; index++) {
             _data[index] = (short)(Sine(index, frequency) * SHRT_MAX); // Приводим уровень к амплитуде от 32767 до -32767.
