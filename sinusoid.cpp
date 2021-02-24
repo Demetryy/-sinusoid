@@ -19,24 +19,24 @@ void InputOfSignatures(char* arr, ofstream& file)
 
 void longWrite(long x, ofstream& file)
 {
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
 }
 
 void integerWrite(uint32_t x, ofstream& file)
 {
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
         x /= 256;
-        cout << static_cast<uint8_t>(x & 0xff);
+        file << static_cast<uint8_t>(x & 0xff);
 }
 
 
