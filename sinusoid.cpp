@@ -14,43 +14,29 @@ static double Sine(int index, double frequency) {
 
 void InputOfSignatures(char* arr, ofstream& file)
 {
-    for (int i = 0; i < 4; i++)
-    {
-        file << arr[i];
-    }
+    file.write(arr,4);
 }
 
 void longWrite(long x, ofstream& file)
 {
-    int x1 = x % 256;
-    x -= x1;
-    x /= 256;
-    int x2 = x % 256;
-    x = x - x2;
-    x = x / 256;
-    int x3 = x % 256;
-    x = x - x1;
-    x = x / 256;
-    int x4 = x;
-
-    unsigned char a = (unsigned char)x1;
-    unsigned char b = (unsigned char)x2;
-    unsigned char c = (unsigned char)x3;
-    unsigned char d = (unsigned char)x4;
-
-    file << a << b << c << d;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
 }
 
-void integerWrite(unsigned int x, ofstream& file)
+void integerWrite(uint32_t x, ofstream& file)
 {
-    int x1 = x % 256;
-    x -= x1;
-    x /= 256;
-
-    unsigned char a = (unsigned char)x1;
-    unsigned char b = (unsigned char)x;
-
-    file << a << b;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
+        x /= 256;
+        cout << static_cast<uint8_t>(x & 0xff);
 }
 
 
