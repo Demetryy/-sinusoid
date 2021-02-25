@@ -53,7 +53,7 @@ int main()
     short frameSize = (short)(16 / 8);
     int time;
 
-    cout << "Введите частоту дискретизации: "; cin >> pcmObj.nSamplesPerSec;
+    cout << "Введите частоту тона: "; cin >> pcmObj.nSamplesPerSec;
     cout << "Введите число каналов: "; cin >> pcmObj.nChannels;
     cout << "Введите время: "; cin >> time;
 
