@@ -6,10 +6,6 @@ using namespace std;
 
 const double PI = 3.14159265359;
 
-static double Sine(int index, double frequency) {
-    return sin(frequency * index);
-}
-
 void InputOfSignatures(char* arr, ofstream& file)
 {
     file.write(arr, 4);
@@ -81,7 +77,7 @@ int main()
     for (int sec = 0; sec < time * 2; sec++) {
 
         for (int index = 0; index < nSamplesPerSec; index++) {
-            _data[index] = (short)(Sine(index, frequency) * SHRT_MAX); // Приводим уровень к амплитуде от 32767 до -32767.
+            _data[index] = (short)(sin(frequency * index) * SHRT_MAX); // Приводим уровень к амплитуде от 32767 до -32767.
             integerWrite(_data[index], file); // записываем данные в файл
         }
     }
