@@ -43,7 +43,7 @@ int main()
     short frameSize = (short)(16 / 8);
     int time;
 
-    cout << "Введите частоту тона: "; cin >> nSamplesPerSec;
+    cout << "Введите частоту дискретизации: "; cin >> nSamplesPerSec;
     cout << "Введите число каналов: "; cin >> nChannels;
     cout << "Введите время: "; cin >> time;
 
