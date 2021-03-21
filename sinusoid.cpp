@@ -33,7 +33,7 @@ int main()
 
     ofstream file("Test.pcm", ios::trunc | ios::binary);
 
-    int sampleRate, waveVolume, time;
+    unsigned long sampleRate, waveVolume, time;
     short frameSize = (short)(16 / 8);
     float waveFrequency;
 
@@ -47,22 +47,21 @@ int main()
     file.write(format, 4);
     file.write(fmt, 4);
     longWrite(0x10, file); //размер чанка - 16(0х10) для формата PCM
-    integerWrite(1, file); //формат аудио - 1 по умолчанию
-    integerWrite(1, file); // число каналов (1 — моно, 2-стерео)
+    integerWrite((short)1, file); //формат аудио - 1 по умолчанию
+    integerWrite((short)1, file); // число каналов (1 — моно, 2-стерео)
     longWrite(sampleRate, file); // частота дискретизации
-    longWrite(sampleRate * 16 / 8, file); // среднее число байт в секунду, используется для эффективной буферизации. Для PCM вычисляется по формуле: (nChannels*nSamplesPerSec*nAvgBytesPerSec)/8.
-    integerWrite(2, file); // выравнивание данных в data-чанке. Для PCM вычисляется по формуле: (nChannels*nAvgBytesPerSec)/8.
-    integerWrite(16, file); // точность звучания (8 бит, 16 бит, ...)
+    longWrite(sampleRate * frameSize, file); // среднее число байт в секунду, используется для эффективной буферизации. Для PCM вычисляется по формуле: (nChannels*nSamplesPerSec*nAvgBytesPerSec)/8.
+    integerWrite(frameSize, file); // выравнивание данных в data-чанке. Для PCM вычисляется по формуле: (nChannels*nAvgBytesPerSec)/8.
+    integerWrite((short)16, file); // точность звучания (8 бит, 16 бит, ...)
     file.write(data, 4);
-    long DataLeng = sampleRate * time;
-    longWrite(DataLeng, file);
+    longWrite(sampleRate * frameSize * time, file);
 
     float period = sampleRate / waveFrequency / 2;
 
     short* _data = new short[sampleRate];
 
     for (int index = 0; index < sampleRate; index++) {
-        _data[index] =  waveVolume * sin(index * PI / period); //вычисление sine-волны
+        _data[index] = waveVolume * sin(index * PI / period); //вычисление sine-волны
     }
 
     for (int index = 0, el = 0; index < sampleRate * time; index++, el++)
