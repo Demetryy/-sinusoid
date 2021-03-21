@@ -6,11 +6,6 @@ using namespace std;
 
 const double PI = 3.14159265359;
 
-void InputOfSignatures(char* arr, ofstream& file)
-{
-    file.write(arr, 4);
-}
-
 void longWrite(long x, ofstream& file)
 {
     file << static_cast<uint8_t>(x & 0xff);
@@ -29,7 +24,6 @@ void integerWrite(uint32_t x, ofstream& file)
     file << static_cast<uint8_t>(x & 0xff);
 }
 
-
 int main()
 {
     setlocale(LC_ALL, "Rus");
@@ -39,47 +33,45 @@ int main()
 
     ofstream file("Test.pcm", ios::trunc | ios::binary);
 
-    int nSamplesPerSec, nChannels, nAvgBytesPerSec;
+    int sampleRate, waveVolume, time;
     short frameSize = (short)(16 / 8);
-    int time;
+    float waveFrequency;
 
-    cout << "Введите частоту дискретизации: "; cin >> nSamplesPerSec;
-    cout << "Введите число каналов: "; cin >> nChannels;
+    cout << "Введите частоту дискретизации: "; cin >> sampleRate;
+    cout << "Введите частоту тона: "; cin >> waveFrequency;
+    cout << "Введите громкость тона: "; cin >> waveVolume; //0...65536
     cout << "Введите время: "; cin >> time;
 
-    nAvgBytesPerSec = nSamplesPerSec * 16 / 8;
-
-    InputOfSignatures(chunk, file); //"RIFF"
-
-    longWrite(nSamplesPerSec * frameSize, file); //вес - 36 * количество байт в области данных
-
-
-    InputOfSignatures(format, file); //"WAVE"
-    InputOfSignatures(fmt, file); //"fmt "
-
+    file.write(chunk, 4);
+    longWrite(sampleRate * frameSize, file); //вес - 36 * количество байт в области данных
+    file.write(format, 4);
+    file.write(fmt, 4);
     longWrite(0x10, file); //размер чанка - 16(0х10) для формата PCM
     integerWrite(1, file); //формат аудио - 1 по умолчанию
-    integerWrite(nChannels, file); // число каналов (1 — моно, 2-стерео)
-    longWrite(nSamplesPerSec, file); // частота дискретизации
-    longWrite(nAvgBytesPerSec, file); // среднее число байт в секунду, используется для эффективной буферизации. Для PCM вычисляется по формуле: (nChannels*nSamplesPerSec*nAvgBytesPerSec)/8.
+    integerWrite(1, file); // число каналов (1 — моно, 2-стерео)
+    longWrite(sampleRate, file); // частота дискретизации
+    longWrite(sampleRate * 16 / 8, file); // среднее число байт в секунду, используется для эффективной буферизации. Для PCM вычисляется по формуле: (nChannels*nSamplesPerSec*nAvgBytesPerSec)/8.
     integerWrite(2, file); // выравнивание данных в data-чанке. Для PCM вычисляется по формуле: (nChannels*nAvgBytesPerSec)/8.
     integerWrite(16, file); // точность звучания (8 бит, 16 бит, ...)
-
-    InputOfSignatures(data, file);
-
-    long DataLeng = nSamplesPerSec * time;
+    file.write(data, 4);
+    long DataLeng = sampleRate * time;
     longWrite(DataLeng, file);
 
+    float period = sampleRate / waveFrequency / 2;
 
-    short* _data = new short[nSamplesPerSec];
-    double frequency = PI * 2 * 440.0 / nSamplesPerSec;
+    short* _data = new short[sampleRate];
 
-    for (int sec = 0; sec < time * 2; sec++) {
+    for (int index = 0; index < sampleRate; index++) {
+        _data[index] =  waveVolume * sin(index * PI / period); //вычисление sine-волны
+    }
 
-        for (int index = 0; index < nSamplesPerSec; index++) {
-            _data[index] = (short)(sin(frequency * index) * SHRT_MAX); // Приводим уровень к амплитуде от 32767 до -32767.
-            integerWrite(_data[index], file); // записываем данные в файл
+    for (int index = 0, el = 0; index < sampleRate * time; index++, el++)
+    {
+        if (el == sampleRate)
+        {
+            el = 0;
         }
+        integerWrite(_data[el], file); // записываем данные в файл
     }
 
     file.close();
