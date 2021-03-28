@@ -1,12 +1,17 @@
 #pragma once
-#include <string>
 #include <fstream>
 
 class GenSinus
 {
 public:
-    void WriteHeader(std::ofstream& file, unsigned long sampleRate, unsigned long time);
-    void Generation(std::ofstream& file, unsigned long sampleRate, unsigned long waveFrequency, unsigned long waveVolume, unsigned long time);
-    //void Initialization(unsigned long sampleRate, unsigned long waveFrequency, unsigned long waveVolume, unsigned long time)
-    unsigned long sampleRate, waveVolume, waveFrequency, time;
+    void WriteHeader(std::ofstream& file);
+    void Generation(std::ofstream& file);
+    void SetSampleRate(long sRate), SetWaveVolume(int wVol),
+        SetWaveFrequency(int wFreq), SetTime(int time);
+    GenSinus();
+    ~GenSinus();
+private:
+    long sampleRate;
+    int waveFrequency, waveVolume, time;
+    short* _data;
 };
