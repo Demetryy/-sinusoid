@@ -54,16 +54,16 @@ void GenSinus::WriteHeader(ofstream& file)
         fmt[4] = { 'f','m','t',' ' }, data[4] = { 'd','a','t','a' };
 
     file.write(chunk, 4);
-    longWrite(sampleRate * 2, file); //вес
+    longWrite(sampleRate * 2, file); //РІРµСЃ
     file.write(format, 4);
     file.write(fmt, 4);
-    longWrite(0x10, file); //размер чанка - 16(0х10) для формата PCM
-    integerWrite(1, file); //формат аудио - 1 по умолчанию
-    integerWrite(1, file); // число каналов (1 — моно, 2-стерео)
-    longWrite(sampleRate, file); // частота дискретизации
-    longWrite(sampleRate * 2, file); // среднее число байт в секунду, используется для эффективной буферизации
-    integerWrite(2, file); // выравнивание данных в data-чанке. 
-    integerWrite(16, file); // точность звучания (8 бит, 16 бит, ...)
+    longWrite(0x10, file); //СЂР°Р·РјРµСЂ С‡Р°РЅРєР° - 16(0С…10) РґР»СЏ С„РѕСЂРјР°С‚Р° PCM
+    integerWrite(1, file); //С„РѕСЂРјР°С‚ Р°СѓРґРёРѕ - 1 РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    integerWrite(1, file); // С‡РёСЃР»Рѕ РєР°РЅР°Р»РѕРІ (1 вЂ” РјРѕРЅРѕ, 2-СЃС‚РµСЂРµРѕ)
+    longWrite(sampleRate, file); // С‡Р°СЃС‚РѕС‚Р° РґРёСЃРєСЂРµС‚РёР·Р°С†РёРё
+    longWrite(sampleRate * 2, file); // СЃСЂРµРґРЅРµРµ С‡РёСЃР»Рѕ Р±Р°Р№С‚ РІ СЃРµРєСѓРЅРґСѓ, РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СЌС„С„РµРєС‚РёРІРЅРѕР№ Р±СѓС„РµСЂРёР·Р°С†РёРё
+    integerWrite(2, file); // РІС‹СЂР°РІРЅРёРІР°РЅРёРµ РґР°РЅРЅС‹С… РІ data-С‡Р°РЅРєРµ. 
+    integerWrite(16, file); // С‚РѕС‡РЅРѕСЃС‚СЊ Р·РІСѓС‡Р°РЅРёСЏ (8 Р±РёС‚, 16 Р±РёС‚, ...)
     file.write(data, 4);
     longWrite(sampleRate * time * 2, file);
 }
@@ -75,7 +75,7 @@ void GenSinus::Generation(ofstream& file)
     _data = new short[sampleRate];
 
     for (int index = 0; index < sampleRate; index++) {
-        _data[index] = waveVolume * sin(index * PI / period); //вычисление sine-волны
+        _data[index] = waveVolume * sin(index * PI / period); //ГўГ»Г·ГЁГ±Г«ГҐГ­ГЁГҐ sine-ГўГ®Г«Г­Г»
     }
 
     for (int index = 0, el = 0; index < sampleRate * time; index++, el++)
@@ -84,7 +84,7 @@ void GenSinus::Generation(ofstream& file)
         {
             el = 0;
         }
-        integerWrite(_data[el], file); // записываем данные в файл
+        integerWrite(_data[el], file); // Г§Г ГЇГЁГ±Г»ГўГ ГҐГ¬ Г¤Г Г­Г­Г»ГҐ Гў ГґГ Г©Г«
     }
 }
 
