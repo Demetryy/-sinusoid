@@ -75,7 +75,7 @@ void GenSinus::Generation(ofstream& file)
     _data = new short[sampleRate];
 
     for (int index = 0; index < sampleRate; index++) {
-        _data[index] = waveVolume * sin(index * PI / period); //âû÷èñëåíèå sine-âîëíû
+        _data[index] = waveVolume * sin(index * PI / period); //вычисление sine-волны
     }
 
     for (int index = 0, el = 0; index < sampleRate * time; index++, el++)
@@ -84,16 +84,16 @@ void GenSinus::Generation(ofstream& file)
         {
             el = 0;
         }
-        integerWrite(_data[el], file); // çàïèñûâàåì äàííûå â ôàéë
+        integerWrite(_data[el], file); //запись данных в файл
     }
 }
 
-GenSinus::GenSinus()
+GenSinus::GenSinus(long sampleRate, int waveFrequency, int waveVolume, int time)
 {
-    sampleRate = 44100;
-    waveFrequency = 11025;
-    waveVolume = 32765;
-    time = 10;
+    this->sampleRate = sampleRate;
+    this->waveFrequency = waveFrequency;
+    this->waveVolume = waveVolume;
+    this->time = time;
 }
 
 GenSinus::~GenSinus()
