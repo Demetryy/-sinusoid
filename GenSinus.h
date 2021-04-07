@@ -8,7 +8,7 @@ public:
     void Generation(std::ofstream& file);
     void SetSampleRate(long sRate), SetWaveVolume(int wVol),
         SetWaveFrequency(int wFreq), SetTime(int time);
-    GenSinus();
+    GenSinus(long sampleRate, int waveFrequency, int waveVolume, int time);
     ~GenSinus();
 private:
     long sampleRate;
