@@ -1,109 +1,79 @@
-﻿#include "GenSinus.h"
-#include <math.h> 
-#include <fstream>
+#include "GenSinus.h"
 #include <iostream>
-#include <functional>   
-#include <map>          
-#include <memory>      
-#include <string>       
-#include <sstream>      
-#include <string_view>  
-#include <variant>      
+#include <fstream>
+#include <string>
 #include <vector>       
 using namespace std;
 
 const double PI = 3.14159265359;
 
-template <class Opts>
-struct CmdOpts : Opts
+int main(int argc, const char** argv)
 {
-    using MyProp = variant<long Opts::*, int Opts::*>;
-    using MyArg = pair<string, MyProp>;
+    // parse args
+    cout << "commands: \n"
+        << "-s 44100 -f 11025 -t 10 -v 32767\n";
+    vector<string> args(argv, argv + argc);
+    for (int i = 0; i < argc; i++)
+        cout << "argument [" << i << "] : " << args[i] << endl;
+    vector<string> commands{ "-fn","-s","-f","-t","-v" };
 
-    ~CmdOpts() = default;
-
-    Opts parse(int argc, char* argv[])
-    {
-        vector<string_view> vargv(argv, argv + argc);
-        for (int idx = 0; idx < argc; ++idx)
-            for (auto& cbk : callbacks)
-                cbk.second(idx, vargv);
-
-        return static_cast<Opts>(*this);
-    }
-
-    static unique_ptr<CmdOpts> Create(std::initializer_list<MyArg> args)
-    {
-        auto cmdOpts = unique_ptr<CmdOpts>(new CmdOpts());
-        for (auto arg : args) cmdOpts->register_callback(arg);
-        return cmdOpts;
-    }
-
-private:
-    using callback_t = function<void(int, const vector<string_view>&)>;
-    map<string, callback_t> callbacks;
-
-    CmdOpts() = default;
-    CmdOpts(const CmdOpts&) = delete;
-    CmdOpts(CmdOpts&&) = delete;
-    CmdOpts& operator=(const CmdOpts&) = delete;
-    CmdOpts& operator=(CmdOpts&&) = delete;
-
-    auto register_callback(string name, MyProp prop)
-    {
-        callbacks[name] = [this, name, prop](int idx, const vector<string_view>& argv)
-        {
-            if (argv[idx] == name)
-            {
-                visit(
-                    [this, idx, &argv](auto&& arg)
-                    {
-                        if (idx < argv.size() - 1)
-                        {
-                            stringstream value;
-                            value << argv[idx + 1];
-                            value >> this->*arg;
-                        }
-                    },
-                    prop);
-            }
-        };
-    };
-
-    auto register_callback(MyArg p) { return register_callback(p.first, p.second); }
-};
-
-int main(int argc, char* argv[])
-{
-    setlocale(LC_ALL, "Rus");
-
+    // default values
     ofstream file("Test.pcm", ios::trunc | ios::binary);
+    long sampleRate = 44100;
+    int waveFrequency = 11025;
+    int time = 10;
+    int waveVolume = 32767;
 
-    GenSinus obj;
-
-    struct Wave
+    if (argc != 1) // если мы имеем аргументы
     {
-        long sampleRate;
-        int waveFrequency, waveVolume, time;
-    };
+        string buf;
+        for (auto& arg : args)
+            buf += arg;
+        int countCmd = count(buf.begin(), buf.end(), '-');
+        int countArgs = argc - countCmd - 1;
+        if (countCmd == countArgs && countCmd <= static_cast<int>(commands.size()))
+        {
+            // continue parse
+            // parse from 1 index
+            pair<string, string> keys;
+            for (int i = 1; i < (countCmd + countArgs); i += 2)
+            {
+                // составляем пары (ключ + аргумент)
+                keys = make_pair(args.at(i), args.at(i + 1));
+                auto it = find(commands.begin(), commands.end(), keys.first);
+                if (it != commands.end())
+                {
+                    int foundIndex = it - commands.begin();
+                    switch (foundIndex)
+                    {
+                    case 0:
+                        sampleRate = stof(keys.second);
+                        break;
+                    case 1:
+                        waveFrequency = stof(keys.second);
+                        break;
+                    case 2:
+                        time = stof(keys.second);
+                        break;
+                    case 3:
+                        waveVolume = stof(keys.second);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-    auto parser = CmdOpts<Wave>::Create({
-        {"--sampleRate", &Wave::sampleRate},
-        {"--waveFrequency", &Wave::waveFrequency},
-        {"--waveVolume", &Wave::waveVolume},
-        {"--time", &Wave::time} });
+       cout << "Sample rate: " << sampleRate << endl
+        << "Frequency: " << waveFrequency << endl
+        << "Duration: " << time << endl
+        << "Volume: " << waveVolume << endl;
 
-    auto wave = parser->parse(argc, argv);
+    GenSinus objWave(sampleRate, waveFrequency, waveVolume, time);
+    objWave.WriteHeader(file);
+    objWave.Generation(file);
 
-    obj.SetSampleRate(wave.sampleRate);
-    obj.SetWaveFrequency(wave.waveFrequency);//0...32767
-    obj.SetWaveVolume(wave.waveVolume);
-    obj.SetTime(wave.time);
+    objWave.~GenSinus();
 
-    obj.WriteHeader(file);
-    obj.Generation(file);
-
-    obj.~GenSinus();
-
-    file.close();
+    system("pause");
 }
